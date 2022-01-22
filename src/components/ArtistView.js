@@ -1,30 +1,32 @@
-import { render } from '@testing-library/react'
-import { useState, useEffect } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
 
-const AlbumView = () => {
+import { useState, useEffect } from 'react'
+import { useParams, Link, useNavigate } from 'react-router-dom'
+import AlbumView from './AlbumView'
+
+const ArtistView = () => {
     const { id } = useParams()
-    const [albumData, setAlbumData] = useState([])
+    const [artistData, setArtistData] = useState([])
     const navigate = useNavigate()
 
-
     useEffect(() => {
+        const API_URL = `http://localhost:4000/album/${id}`
         const fetchData = async () => {
-            const API_URL = `http://localhost:4000/song/${id}`
             const response = await fetch(API_URL)
             const resData = await response.json()
-            setAlbumData(resData.results)
-            console.log(albumData)
+            setArtistData(resData.results)
+            console.log(artistData)
         }
         fetchData()
     }, [id])
 
-    const justSongs = albumData.filter(entry => entry.kind === 'song')
+    const justAlbums = artistData.filter(entry => entry.collectionType === 'Album')
 
-    const renderSongs = justSongs.map((song, i) => {
+    const renderAlbums = justAlbums.map((album, i) => {
         return (
             <div key={i}>
-                <p>{song.trackName}</p>
+                <Link to={`/album/${album.collectionId}`}>
+                    <p>{album.collectionName}</p>
+                </Link>
             </div>
         )
     })
@@ -41,10 +43,10 @@ const AlbumView = () => {
     return (
         <div>
             {navButtons()}
-            {albumData.length > 0 ? <h2>{albumData[0].collectionName}</h2> : <h2>Loading...</h2>}
-            {renderSongs}
+            {artistData.length > 0 ? <h2>{artistData[0].artistName}</h2> : <h2>Loading...</h2>}
+            {renderAlbums}
         </div>
     )
 }
 
-export default AlbumView
+export default ArtistView
