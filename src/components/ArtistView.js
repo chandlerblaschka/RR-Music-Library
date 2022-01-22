@@ -1,46 +1,50 @@
-import {useEffect, useState} from 'react'
-import {useParams, Link, useHistory} from 'react-router-dom'
+import { render } from '@testing-library/react'
+import { useState, useEffect } from 'react'
+import { useParams, useNavigate } from 'react-router-dom'
 
-const ArtistView = () => {
+const AlbumView = () => {
     const { id } = useParams()
-    const [ artistData, setArtistData ] = useState([])
-    const history = useHistory()
-    
+    const [albumData, setAlbumData] = useState([])
+    const navigate = useNavigate()
+
+
     useEffect(() => {
-        const API_URL = `http://localhost:4000/album/${id}`
         const fetchData = async () => {
+            const API_URL = `http://localhost:4000/song/${id}`
             const response = await fetch(API_URL)
             const resData = await response.json()
-            setArtistData(resData.results)
+            setAlbumData(resData.results)
+            console.log(albumData)
         }
         fetchData()
     }, [id])
 
-    const allAlbums = artistData.filter(entity => entity.collectionType === 'Album')
-                        .map((album, i) => { 
-                            return (
-                                <div key={i}>
-                                    <Link to={`/album/${album.collectionId}`}>
-                                        <p>{album.collectionName}</p>
-                                    </Link>
-                                </div>)
-                                })
-    
+    const justSongs = albumData.filter(entry => entry.kind === 'song')
+
+    const renderSongs = justSongs.map((song, i) => {
+        return (
+            <div key={i}>
+                <p>{song.trackName}</p>
+            </div>
+        )
+    })
+
     const navButtons = () => {
         return (
             <div>
-                <button onClick={() => {history.push('/')}}>Home</button> | <button onClick={() => history.goBack()}>Back</button>
+                <button onClick={() => navigate(-1)}>Back</button>
+                <button onClick={() => navigate('/')}>Home</button>
             </div>
         )
     }
 
     return (
         <div>
-            {artistData.length > 0 ? <h2>{artistData[0].artistName}</h2> : <p>loading...</p>}
             {navButtons()}
-            {allAlbums}
+            {albumData.length > 0 ? <h2>{albumData[0].collectionName}</h2> : <h2>Loading...</h2>}
+            {renderSongs}
         </div>
     )
 }
 
-export default ArtistView
+export default AlbumView
