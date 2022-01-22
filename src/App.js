@@ -2,6 +2,7 @@ import './App.css';
 import { useEffect, useState } from 'react'
 import Gallery from './components/Gallery'
 import SearchBar from './components/SearchBar'
+import { DataContext } from './context/DataContext.js'
 
 function App() {
   let [searchTerm, setSearchTerm] = useState('')
@@ -10,18 +11,18 @@ function App() {
 
   useEffect(() => {
     if (searchTerm) {
-      document.title=`${searchTerm} Music`
+      document.title = `${searchTerm} Music`
       const fetchData = async () => {
         const response = await fetch(`https://itunes.apple.com/search?term=${searchTerm}`)
         const resData = await response.json()
-        if(resData.results.length > 0) {
+        if (resData.results.length > 0) {
           setData(resData.results)
         } else {
           setMessage('Not Found')
         }
       }
       fetchData()
-  }
+    }
   }, [searchTerm])
 
   const handleSearch = (e, term) => {
@@ -33,7 +34,9 @@ function App() {
     <div className="App">
       <SearchBar handleSearch={handleSearch} />
       {message}
-      <Gallery data={data} />
+      <DataContext.Provider value={data}>
+        <Gallery />
+      </DataContext.Provider>
     </div>
   );
 }
